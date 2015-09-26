@@ -1,8 +1,19 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="android:Theme.Material">
         <!-- Customize your theme here. -->
+
     </style>
 
+    <style name="LinearLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="StatusBar" parent="android:Theme.Material.Light.LightStatusBar">
+        <item name="android:colorPrimary">@android:color/holo_blue_bright</item>
+        <item name="android:colorPrimaryDark">@android:color/holo_orange_dark</item>
+        <item name="android:windowActionBar">@android:color/holo_blue_bright</item>
+    </style>
 </resources>

@@ -3,14 +3,22 @@ package com.example.shrutinallari.myapplication;
 
 import android.app.Activity;
 import android.app.ListActivity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 
 import org.json.JSONObject;
 
@@ -25,9 +33,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
-public class DynamicListViewActivity extends Activity {
+public class DynamicListViewActivity extends Activity implements ListView.OnItemClickListener {
 
     ListView mListView;
+
+    private HashMap<String, Object> hm;
+    private SimpleAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,7 +46,7 @@ public class DynamicListViewActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         // URL to the JSON data
-        String strUrl = "http://wptrafficanalyzer.in/p/demo1/first.php/countries";
+        String strUrl = "http://www.abercrombie.com/anf/nativeapp/Feeds/promotions.json";
 
         // Creating a new non-ui thread task to download json data
         DownloadTask downloadTask = new DownloadTask();
@@ -45,14 +56,17 @@ public class DynamicListViewActivity extends Activity {
 
         // Getting a reference to ListView of activity_main
         mListView = (ListView) findViewById(R.id.listcountries);
+        mListView.setOnItemClickListener(this);
 
     }
 
-    /** A method to download json data from url */
+    /**
+     * A method to download json data from url
+     */
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
-        try{
+        try {
             URL url = new URL(strUrl);
 
             // Creating an http connection to communicate with url
@@ -66,10 +80,10 @@ public class DynamicListViewActivity extends Activity {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
 
-            StringBuffer sb  = new StringBuffer();
+            StringBuffer sb = new StringBuffer();
 
             String line = "";
-            while( ( line = br.readLine())  != null){
+            while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
 
@@ -77,24 +91,39 @@ public class DynamicListViewActivity extends Activity {
 
             br.close();
 
-        }catch(Exception e){
-            Log.d("","");
-        }finally{
+        } catch (Exception e) {
+            Log.d("", "");
+        } finally {
             iStream.close();
         }
 
         return data;
     }
 
-    /** AsyncTask to download json data */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        String details = ((TextView) view.findViewById(R.id.tv_country_details)).getText().toString();
+
+        Toast.makeText(this, "onclick", Toast.LENGTH_LONG);
+        Intent abc = new Intent(this, Main2Activity.class);
+        abc.putExtra(CountryJSONParser.TAG_DESCRIPTION, details);
+        startActivity(abc);
+
+    }
+
+    /**
+     * AsyncTask to download json data
+     */
     private class DownloadTask extends AsyncTask<String, Integer, String> {
         String data = null;
+
         @Override
         protected String doInBackground(String... url) {
-            try{
+            try {
                 data = downloadUrl(url[0]);
-            }catch(Exception e){
-                Log.d("Background Task",e.toString());
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
             }
             return data;
         }
@@ -110,19 +139,22 @@ public class DynamicListViewActivity extends Activity {
         }
     }
 
-    /** AsyncTask to parse json data and load ListView */
-    private class ListViewLoaderTask extends AsyncTask<String, Void, SimpleAdapter>{
+    /**
+     * AsyncTask to parse json data and load ListView
+     */
+    private class ListViewLoaderTask extends AsyncTask<String, Void, SimpleAdapter> {
 
         JSONObject jObject;
+
         // Doing the parsing of xml data in a non-ui thread
         @Override
         protected SimpleAdapter doInBackground(String... strJson) {
-            try{
+            try {
                 jObject = new JSONObject(strJson[0]);
                 CountryJSONParser countryJsonParser = new CountryJSONParser();
                 countryJsonParser.parse(jObject);
-            }catch(Exception e){
-                Log.d("JSON Exception1",e.toString());
+            } catch (Exception e) {
+                Log.d("JSON Exception1", e.toString());
             }
 
             // Instantiating json parser class
@@ -131,129 +163,44 @@ public class DynamicListViewActivity extends Activity {
             // A list object to store the parsed countries list
             List<HashMap<String, Object>> countries = null;
 
-            try{
+            try {
                 // Getting the parsed data as a List construct
                 countries = countryJsonParser.parse(jObject);
-            }catch(Exception e){
-                Log.d("Exception",e.toString());
+            } catch (Exception e) {
+                Log.d("Exception", e.toString());
             }
 
             // Keys used in Hashmap
-            String[] from = { "country","flag","details"};
+            String[] from = {"country", "image", "details"};
 
             // Ids of views in listview_layout
-            int[] to = { R.id.tv_country,R.id.iv_flag,R.id.tv_country_details};
+            int[] to = {R.id.tv_country, R.id.tv_flag, R.id.tv_country_details};
 
             // Instantiating an adapter to store each items
             // R.layout.listview_layout defines the layout of each item
-            SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), countries, R.layout.activity_cell, from, to);
-
+            adapter = new SimpleAdapter(getBaseContext(), countries, R.layout.activity_cell, from, to);
             return adapter;
         }
 
-        /** Invoked by the Android on "doInBackground" is executed */
+        /**
+         * Invoked by the Android on "doInBackground" is executed
+         */
         @Override
         protected void onPostExecute(SimpleAdapter adapter) {
-
             // Setting adapter for the listview
             mListView.setAdapter(adapter);
+            final ImageLoader mImageLoader = VolleySingleton.getInstance().getImageLoader();
+            SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
 
-            for(int i=0;i<adapter.getCount();i++){
-                HashMap<String, Object> hm = (HashMap<String, Object>) adapter.getItem(i);
-                String imgUrl = (String) hm.get("flag_path");
-                ImageLoaderTask imageLoaderTask = new ImageLoaderTask();
-
-                HashMap<String, Object> hmDownload = new HashMap<String, Object>();
-                hm.put("flag_path",imgUrl);
-                hm.put("position", i);
-
-                // Starting ImageLoaderTask to download and populate image in the listview
-                imageLoaderTask.execute(hm);
-            }
-        }
-    }
-
-    /** AsyncTask to download and load an image in ListView */
-    private class ImageLoaderTask extends AsyncTask<HashMap<String, Object>, Void, HashMap<String, Object>>{
-
-        @Override
-        protected HashMap<String, Object> doInBackground(HashMap<String, Object>... hm) {
-
-            InputStream iStream=null;
-            String imgUrl = (String) hm[0].get("flag_path");
-            int position = (Integer) hm[0].get("position");
-
-            URL url;
-            try {
-                url = new URL(imgUrl);
-
-                // Creating an http connection to communicate with url
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                // Connecting to url
-                urlConnection.connect();
-
-                // Reading data from url
-                iStream = urlConnection.getInputStream();
-
-                // Getting Caching directory
-                File cacheDirectory = getBaseContext().getCacheDir();
-
-                // Temporary file to store the downloaded image
-                File tmpFile = new File(cacheDirectory.getPath() + "/wpta_"+position+".png");
-
-                // The FileOutputStream to the temporary file
-                FileOutputStream fOutStream = new FileOutputStream(tmpFile);
-
-                // Creating a bitmap from the downloaded inputstream
-                Bitmap b = BitmapFactory.decodeStream(iStream);
-
-                // Writing the bitmap to the temporary file as png file
-                b.compress(Bitmap.CompressFormat.PNG,100, fOutStream);
-
-                // Flush the FileOutputStream
-                fOutStream.flush();
-
-                //Close the FileOutputStream
-                fOutStream.close();
-
-                // Create a hashmap object to store image path and its position in the listview
-                HashMap<String, Object> hmBitmap = new HashMap<String, Object>();
-
-                // Storing the path to the temporary image file
-                hmBitmap.put("flag",tmpFile.getPath());
-
-                // Storing the position of the image in the listview
-                hmBitmap.put("position",position);
-
-                // Returning the HashMap object containing the image path and position
-                return hmBitmap;
-
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(HashMap<String, Object> result) {
-            // Getting the path to the downloaded image
-            String path = (String) result.get("flag");
-
-            // Getting the position of the downloaded image
-            int position = (Integer) result.get("position");
-
-            // Getting adapter of the listview
-            SimpleAdapter adapter = (SimpleAdapter ) mListView.getAdapter();
-
-            // Getting the hashmap object at the specified position of the listview
-            HashMap<String, Object> hm = (HashMap<String, Object>) adapter.getItem(position);
-
-            // Overwriting the existing path in the adapter
-            hm.put("flag",path);
-
-            // Noticing listview about the dataset changes
-            adapter.notifyDataSetChanged();
+                @Override
+                public boolean setViewValue(View view, Object data, String textRepresentation) {
+                    if (view.getId() == R.id.tv_flag) {
+                        ((NetworkImageView) view).setImageUrl(getHm().toString(), mImageLoader);
+                        return true;
+                    } else
+                        return false;
+                }
+            };
         }
     }
 
@@ -261,5 +208,23 @@ public class DynamicListViewActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    public HashMap<String, Object> getHm() {
+        if(adapter!=null) {
+            for (int i = 0; i < adapter.getCount(); i++) {
+                hm = (HashMap<String, Object>) adapter.getItem(i);
+                String imgUrl = (String) hm.get("flag_path");
+
+                HashMap<String, Object> hmDownload = new HashMap<String, Object>();
+                hm.put("flag_path", imgUrl);
+                hm.put("position", i);
+            }
+        }
+        return hm;
+    }
+
+    public void setHm(HashMap<String, Object> hm) {
+        this.hm = hm;
     }
 }
