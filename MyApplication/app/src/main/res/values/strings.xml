@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Abercombie and Fitch</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="flag_val">Flag Value</string>
-    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_main2">PhotoActivity</string>
+    <string name="title_activity_main3">Main3Activity</string>
 </resources>

@@ -7,35 +7,26 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@android:color/holo_orange_dark"
-    tools:context="com.example.shrutinallari.myapplication.Main2Activity">
+    tools:context="com.example.shrutinallari.myapplication.PhotoActivity">
 
     <TextView
+        android:id="@+id/details"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/details"/>
+        android:layout_height="wrap_content" />
     <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/title"
-        android:textSize="20dp"
-        android:textColor="@android:color/darker_gray"/>
+        android:textColor="@android:color/darker_gray"
+        android:textSize="20dp" />
     <ImageView
         android:id="@+id/description"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="5dp" />
     <WebView
+        android:id="@+id/webhtml"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:id="@+id/webhtml"></WebView>
-    <WebView
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:id="@+id/webdata"></WebView>
-    <WebView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/webvw"></WebView>
+        android:layout_height="50dp"></WebView>
 
 </LinearLayout>

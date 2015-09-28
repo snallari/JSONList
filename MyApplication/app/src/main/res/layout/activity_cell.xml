@@ -9,47 +9,38 @@
         android:id="@+id/cv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:elevation="10dp"
         android:padding="10dp"
+        cv:cardBackgroundColor="@android:color/darker_gray"
         cv:cardCornerRadius="50dp"
-        cv:contentPadding="20dp"
         cv:cardMaxElevation="20dp"
         cv:cardPreventCornerOverlap="true"
-        cv:cardBackgroundColor="@android:color/darker_gray"
-        android:layout_margin="10dp">
+        cv:contentPadding="20dp">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal">
+            android:orientation="vertical">
 
-            <com.android.volley.toolbox.NetworkImageView
+            <ImageView
                 android:id="@+id/tv_flag"
-                android:layout_width="20dp"
+                android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:padding="5dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginRight="16dp"
-                android:text="New Text" />
+                android:background="@android:color/white" />
 
             <TextView
                 android:id="@+id/tv_country"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/tv_flag"
-                android:textStyle="bold"
-                android:textSize="21dp"/>
+                android:textSize="21dp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_country_details"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_country"
-                android:text="New Text"
-                android:textSize="21dp"
                 android:textStyle="bold"/>
-        </RelativeLayout>
+        </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

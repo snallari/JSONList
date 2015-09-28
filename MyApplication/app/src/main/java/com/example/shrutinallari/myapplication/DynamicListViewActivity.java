@@ -2,7 +2,6 @@ package com.example.shrutinallari.myapplication;
 
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,21 +9,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,12 +34,14 @@ public class DynamicListViewActivity extends Activity implements ListView.OnItem
 
     private HashMap<String, Object> hm;
     private SimpleAdapter adapter;
+    private ImageView imview;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        imview = (ImageView) findViewById(R.id.tv_flag);
         // URL to the JSON data
         String strUrl = "http://www.abercrombie.com/anf/nativeapp/Feeds/promotions.json";
 
@@ -106,10 +103,16 @@ public class DynamicListViewActivity extends Activity implements ListView.OnItem
         String details = ((TextView) view.findViewById(R.id.tv_country_details)).getText().toString();
 
         Toast.makeText(this, "onclick", Toast.LENGTH_LONG);
-        Intent abc = new Intent(this, Main2Activity.class);
+        Intent abc = new Intent(this, PhotoActivity.class);
         abc.putExtra(CountryJSONParser.TAG_DESCRIPTION, details);
         startActivity(abc);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
     /**
@@ -189,42 +192,97 @@ public class DynamicListViewActivity extends Activity implements ListView.OnItem
         protected void onPostExecute(SimpleAdapter adapter) {
             // Setting adapter for the listview
             mListView.setAdapter(adapter);
-            final ImageLoader mImageLoader = VolleySingleton.getInstance().getImageLoader();
+            if (adapter != null) {
+                for (int i = 0; i < adapter.getCount(); i++) {
+                    hm = (HashMap<String, Object>) adapter.getItem(i);
+                    String imgUrl = (String) hm.get("flag_path");
+
+                    HashMap<String, Object> hmDownload = new HashMap<String, Object>();
+                    hm.put("flag_path", imgUrl);
+                    hm.put("position", i);
+                }
+            }
             SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
 
                 @Override
                 public boolean setViewValue(View view, Object data, String textRepresentation) {
-                    if (view.getId() == R.id.tv_flag) {
-                        ((NetworkImageView) view).setImageUrl(getHm().toString(), mImageLoader);
-                        return true;
-                    } else
-                        return false;
+                    Picasso.with(getBaseContext()).load("http://anf.scene7.com/is/image/anf/anf-US-20150629-app-women-shorts").into(imview);
+                    return true;
                 }
             };
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    /**
+     * AsyncTask to parse json data and load ListView
+     */
+    private class ListViewLoaderTask extends AsyncTask<String, Void, SimpleAdapter> {
 
-    public HashMap<String, Object> getHm() {
-        if(adapter!=null) {
-            for (int i = 0; i < adapter.getCount(); i++) {
-                hm = (HashMap<String, Object>) adapter.getItem(i);
-                String imgUrl = (String) hm.get("flag_path");
+        JSONObject jObject;
 
-                HashMap<String, Object> hmDownload = new HashMap<String, Object>();
-                hm.put("flag_path", imgUrl);
-                hm.put("position", i);
+        // Doing the parsing of xml data in a non-ui thread
+        @Override
+        protected SimpleAdapter doInBackground(String... strJson) {
+            try {
+                jObject = new JSONObject(strJson[0]);
+                CountryJSONParser countryJsonParser = new CountryJSONParser();
+                countryJsonParser.parse(jObject);
+            } catch (Exception e) {
+                Log.d("JSON Exception1", e.toString());
             }
+
+            // Instantiating json parser class
+            CountryJSONParser countryJsonParser = new CountryJSONParser();
+
+            // A list object to store the parsed countries list
+            List<HashMap<String, Object>> countries = null;
+
+            try {
+                // Getting the parsed data as a List construct
+                countries = countryJsonParser.parse(jObject);
+            } catch (Exception e) {
+                Log.d("Exception", e.toString());
+            }
+
+            // Keys used in Hashmap
+            String[] from = {"country", "image", "details"};
+
+            // Ids of views in listview_layout
+            int[] to = {R.id.tv_country, R.id.tv_flag, R.id.tv_country_details};
+
+            // Instantiating an adapter to store each items
+            // R.layout.listview_layout defines the layout of each item
+            adapter = new SimpleAdapter(getBaseContext(), countries, R.layout.activity_cell, from, to);
+            return adapter;
         }
-        return hm;
+
+        /**
+         * Invoked by the Android on "doInBackground" is executed
+         */
+        @Override
+        protected void onPostExecute(SimpleAdapter adapter) {
+            // Setting adapter for the listview
+            mListView.setAdapter(adapter);
+            if (adapter != null) {
+                for (int i = 0; i < adapter.getCount(); i++) {
+                    hm = (HashMap<String, Object>) adapter.getItem(i);
+                    String imgUrl = (String) hm.get("flag_path");
+
+                    HashMap<String, Object> hmDownload = new HashMap<String, Object>();
+                    hm.put("flag_path", imgUrl);
+                    hm.put("position", i);
+                }
+            }
+            SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
+
+                @Override
+                public boolean setViewValue(View view, Object data, String textRepresentation) {
+                    Picasso.with(getBaseContext()).load("http://anf.scene7.com/is/image/anf/anf-US-20150629-app-women-shorts").into(imview);
+                    return true;
+                }
+            };
+        }
     }
 
-    public void setHm(HashMap<String, Object> hm) {
-        this.hm = hm;
-    }
+
 }

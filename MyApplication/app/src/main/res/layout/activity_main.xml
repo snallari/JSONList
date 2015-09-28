@@ -4,16 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical"
-    android:background="@android:color/holo_orange_dark">
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/listcountries"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="10dp"
-        android:longClickable="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:longClickable="true">
     </ListView>
     <!-- -->
     <TextView
