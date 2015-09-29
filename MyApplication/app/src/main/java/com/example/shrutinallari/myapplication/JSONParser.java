@@ -15,7 +15,7 @@ import org.json.JSONObject;
 /**
  * A class to parse json data
  */
-public class CountryJSONParser {
+public class JSONParser {
 
     public static final String TAG_TITLE = "title";
     public static final String TAG_PROMOTIONS = "promotions";

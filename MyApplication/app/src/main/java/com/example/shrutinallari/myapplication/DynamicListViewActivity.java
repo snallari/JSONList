@@ -104,7 +104,7 @@ public class DynamicListViewActivity extends Activity implements ListView.OnItem
 
         Toast.makeText(this, "onclick", Toast.LENGTH_LONG);
         Intent abc = new Intent(this, PhotoActivity.class);
-        abc.putExtra(CountryJSONParser.TAG_DESCRIPTION, details);
+        abc.putExtra(JSONParser.TAG_DESCRIPTION, details);
         startActivity(abc);
 
     }
@@ -154,14 +154,14 @@ public class DynamicListViewActivity extends Activity implements ListView.OnItem
         protected SimpleAdapter doInBackground(String... strJson) {
             try {
                 jObject = new JSONObject(strJson[0]);
-                CountryJSONParser countryJsonParser = new CountryJSONParser();
+                JSONParser countryJsonParser = new JSONParser();
                 countryJsonParser.parse(jObject);
             } catch (Exception e) {
                 Log.d("JSON Exception1", e.toString());
             }
 
             // Instantiating json parser class
-            CountryJSONParser countryJsonParser = new CountryJSONParser();
+            JSONParser countryJsonParser = new JSONParser();
 
             // A list object to store the parsed countries list
             List<HashMap<String, Object>> countries = null;

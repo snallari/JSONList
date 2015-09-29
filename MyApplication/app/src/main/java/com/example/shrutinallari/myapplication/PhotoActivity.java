@@ -24,9 +24,9 @@ public class PhotoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photodetail);
         Intent in = getIntent();
-        String title = in.getStringExtra(CountryJSONParser.TAG_TITLE);
-        String description = in.getStringExtra(CountryJSONParser.TAG_DESCRIPTION);
-        String details = in.getStringExtra(CountryJSONParser.TAG_BUTTONTITLE);
+       // String title = in.getStringExtra(JSONParser.TAG_TITLE);
+        String description = in.getStringExtra(JSONParser.TAG_DESCRIPTION);
+      //  String details = in.getStringExtra(JSONParser.TAG_BUTTONTITLE);
         TextView tit = (TextView) findViewById(R.id.title);
         tit.setText(description);
         v1 = (ImageView) findViewById(R.id.description);
