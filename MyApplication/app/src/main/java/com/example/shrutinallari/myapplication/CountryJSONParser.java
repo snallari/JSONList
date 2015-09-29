@@ -17,10 +17,10 @@ import org.json.JSONObject;
  */
 public class CountryJSONParser {
 
-    public static final String TAG_TITLE="title";
-    public static final String TAG_PROMOTIONS="promotions";
-    public static final String TAG_DESCRIPTION="description";
-    public static final String TAG_BUTTONTITLE="title";
+    public static final String TAG_TITLE = "title";
+    public static final String TAG_PROMOTIONS = "promotions";
+    public static final String TAG_DESCRIPTION = "description";
+    public static final String TAG_BUTTONTITLE = "title";
 
     // Receives a JSONObject and returns a list
     public List<HashMap<String, Object>> parse(JSONObject jObject) {
@@ -63,11 +63,11 @@ public class CountryJSONParser {
 
         HashMap<String, Object> country = new HashMap<String, Object>();
         String countryName = "";
-            String flag="";
-          String language = "";
+        String flag = "";
+        String language = "";
 //        String capital = "";
 //        String currencyCode = "";
-          String currencyName = "";
+        String currencyName = "";
 
         try {
             countryName = jCountry.getString(TAG_TITLE);
@@ -77,7 +77,7 @@ public class CountryJSONParser {
 //          currencyCode = jCountry.getJSONObject("button").getString("target");
 //          currencyName = jCountry.getJSONObject("button").getString("title");
 
-            String details =   language;
+            String details = language;
 
             country.put("country", countryName);
             country.put("image", flag);

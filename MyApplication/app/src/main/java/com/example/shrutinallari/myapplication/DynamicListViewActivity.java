@@ -39,9 +39,9 @@ public class DynamicListViewActivity extends Activity implements ListView.OnItem
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_list);
 
-        imview = (ImageView) findViewById(R.id.tv_flag);
+        imview = (ImageView) findViewById(R.id.imageView);
         // URL to the JSON data
         String strUrl = "http://www.abercrombie.com/anf/nativeapp/Feeds/promotions.json";
 
@@ -100,7 +100,7 @@ public class DynamicListViewActivity extends Activity implements ListView.OnItem
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        String details = ((TextView) view.findViewById(R.id.tv_country_details)).getText().toString();
+        String details = ((TextView) view.findViewById(R.id.textView2)).getText().toString();
 
         Toast.makeText(this, "onclick", Toast.LENGTH_LONG);
         Intent abc = new Intent(this, PhotoActivity.class);
@@ -177,82 +177,11 @@ public class DynamicListViewActivity extends Activity implements ListView.OnItem
             String[] from = {"country", "image", "details"};
 
             // Ids of views in listview_layout
-            int[] to = {R.id.tv_country, R.id.tv_flag, R.id.tv_country_details};
+            int[] to = {R.id.textView, R.id.imageView, R.id.textView2};
 
             // Instantiating an adapter to store each items
             // R.layout.listview_layout defines the layout of each item
-            adapter = new SimpleAdapter(getBaseContext(), countries, R.layout.activity_cell, from, to);
-            return adapter;
-        }
-
-        /**
-         * Invoked by the Android on "doInBackground" is executed
-         */
-        @Override
-        protected void onPostExecute(SimpleAdapter adapter) {
-            // Setting adapter for the listview
-            mListView.setAdapter(adapter);
-            if (adapter != null) {
-                for (int i = 0; i < adapter.getCount(); i++) {
-                    hm = (HashMap<String, Object>) adapter.getItem(i);
-                    String imgUrl = (String) hm.get("flag_path");
-
-                    HashMap<String, Object> hmDownload = new HashMap<String, Object>();
-                    hm.put("flag_path", imgUrl);
-                    hm.put("position", i);
-                }
-            }
-            SimpleAdapter.ViewBinder viewBinder = new SimpleAdapter.ViewBinder() {
-
-                @Override
-                public boolean setViewValue(View view, Object data, String textRepresentation) {
-                    Picasso.with(getBaseContext()).load("http://anf.scene7.com/is/image/anf/anf-US-20150629-app-women-shorts").into(imview);
-                    return true;
-                }
-            };
-        }
-    }
-
-    /**
-     * AsyncTask to parse json data and load ListView
-     */
-    private class ListViewLoaderTask extends AsyncTask<String, Void, SimpleAdapter> {
-
-        JSONObject jObject;
-
-        // Doing the parsing of xml data in a non-ui thread
-        @Override
-        protected SimpleAdapter doInBackground(String... strJson) {
-            try {
-                jObject = new JSONObject(strJson[0]);
-                CountryJSONParser countryJsonParser = new CountryJSONParser();
-                countryJsonParser.parse(jObject);
-            } catch (Exception e) {
-                Log.d("JSON Exception1", e.toString());
-            }
-
-            // Instantiating json parser class
-            CountryJSONParser countryJsonParser = new CountryJSONParser();
-
-            // A list object to store the parsed countries list
-            List<HashMap<String, Object>> countries = null;
-
-            try {
-                // Getting the parsed data as a List construct
-                countries = countryJsonParser.parse(jObject);
-            } catch (Exception e) {
-                Log.d("Exception", e.toString());
-            }
-
-            // Keys used in Hashmap
-            String[] from = {"country", "image", "details"};
-
-            // Ids of views in listview_layout
-            int[] to = {R.id.tv_country, R.id.tv_flag, R.id.tv_country_details};
-
-            // Instantiating an adapter to store each items
-            // R.layout.listview_layout defines the layout of each item
-            adapter = new SimpleAdapter(getBaseContext(), countries, R.layout.activity_cell, from, to);
+            adapter = new SimpleAdapter(getBaseContext(), countries, R.layout.activity_listitem, from, to);
             return adapter;
         }
 
